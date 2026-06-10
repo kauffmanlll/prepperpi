@@ -1,4 +1,6 @@
 # PrepperPi additions
+config/network.conf
+configs/hostapd/hostapd.conf
 data/
 logs/
 backup/
