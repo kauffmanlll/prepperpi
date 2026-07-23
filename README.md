@@ -18,6 +18,7 @@ PrepperPi transforms your Raspberry Pi into a powerful offline knowledge server,
 ## 📋 Hardware Requirements
 
 - **Raspberry Pi 4** (recommended) or **Raspberry Pi 3B+**
+- **Note**: Some Pi images report their OS as Debian 13 "Trixie" and use NetworkManager instead of dhcpcd for Wi-Fi — additional configuration may be required
 - **MicroSD card** 32GB minimum, 64GB+ recommended
 - **Wi-Fi capability** (built-in on Pi 3B+ and Pi 4)
 - **Ethernet connection** (for initial setup and content updates)
@@ -264,23 +265,10 @@ sudo /opt/prepperpi/scripts/verify_install.sh
    sudo systemctl status nginx
    ```
 
-<<<<<<< HEAD
 2. **Check Flask application**:
    ```bash
    sudo systemctl status prepperpi-monitor
    ```
-=======
-`
-/opt/prepperpi/
-config/          # Configuration files
-scripts/         # Installation and management scripts
-web/            # Web interface files
-logs/           # System and application logs
-backup/         # Automated backups
-systemd/        # Service definitions
-data/           # Kiwix content and library
-`
->>>>>>> 685c56559e3db77be73d60da282d8ee04020e068
 
 3. **View error logs**:
    ```bash
