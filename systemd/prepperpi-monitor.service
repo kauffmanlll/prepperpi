@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
-Group=pi
-ExecStart=/usr/bin/python3 /opt/prepperpi/scripts/monitor.py
+User=prepperpi
+Group=prepperpi
+ExecStart=/opt/prepperpi/venv/bin/python3 /opt/prepperpi/scripts/monitor.py
 Restart=always
 RestartSec=30
 StandardOutput=journal

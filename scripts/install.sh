@@ -179,10 +179,10 @@ for f in "$REPO_DIR/systemd/"*.service "$REPO_DIR/systemd/"*.timer; do
     [[ -f "$f" ]] && cp "$f" /etc/systemd/system/ && info "  installed $(basename "$f")"
 done
 
-# kiwix-serve hardening drop-in
-mkdir -p /etc/systemd/system/kiwix-serve.service.d
-cp "$REPO_DIR/systemd/kiwix-serve.service.d/override.conf" \
-   /etc/systemd/system/kiwix-serve.service.d/override.conf
+# prepperpi-kiwix hardening drop-in
+mkdir -p /etc/systemd/system/prepperpi-kiwix.service.d
+cp "$REPO_DIR/systemd/prepperpi-kiwix.service.d/override.conf" \
+   /etc/systemd/system/prepperpi-kiwix.service.d/override.conf
 
 # dnsmasq timing fix: wait for hostapd/wlan0 to be ready before starting
 mkdir -p /etc/systemd/system/dnsmasq.service.d
@@ -209,7 +209,7 @@ systemctl enable dnsmasq
 
 # PrepperPi services
 systemctl enable prepperpi-web.service
-systemctl enable kiwix-serve.service
+systemctl enable prepperpi-kiwix.service
 systemctl enable nat-iptables.service
 systemctl enable prepperpi-monitor.service
 systemctl enable prepperpi-backup.timer
