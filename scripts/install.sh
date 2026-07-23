@@ -35,7 +35,7 @@ for var in SSID PASSPHRASE COUNTRY WIFI_INTERFACE SUBNET PI_IP DHCP_RANGE_START 
         || die "$var is not set in config/network.conf. Compare against config/network.conf.example."
 done
 
-[[ "${PASSPHRASE}" != "PrepperPi1234!" ]] \
+[[ "${PASSPHRASE}" != "PrepperPi1234!" && "${PASSPHRASE}" != "CHANGE_ME_STRONG_PASSWORD" ]] \
     || die "Set a real PASSPHRASE in config/network.conf before installing."
 [[ ${#PASSPHRASE} -ge 8 && ${#PASSPHRASE} -le 63 ]] \
     || die "PASSPHRASE must be 8–63 characters (WPA2 requirement)."
@@ -88,11 +88,15 @@ info "Installed Python packages: $(/opt/prepperpi/venv/bin/pip freeze | paste -s
 info "Copying application files..."
 find "$REPO_DIR/scripts" -name "*.sh" -exec dos2unix -q {} \;
 
-rsync -a --delete "$REPO_DIR/webapp/" /opt/prepperpi/webapp/ 2>/dev/null \
-    || cp -r "$REPO_DIR/webapp/." /opt/prepperpi/webapp/
+if [[ "$REPO_DIR" != "/opt/prepperpi" ]]; then
+    rsync -a --delete "$REPO_DIR/webapp/" /opt/prepperpi/webapp/ 2>/dev/null \
+        || cp -r "$REPO_DIR/webapp/." /opt/prepperpi/webapp/
 
-cp "$REPO_DIR/scripts/"*.sh  /opt/prepperpi/scripts/
-cp "$REPO_DIR/scripts/"*.py  /opt/prepperpi/scripts/ 2>/dev/null || true
+    cp "$REPO_DIR/scripts/"*.sh  /opt/prepperpi/scripts/
+    cp "$REPO_DIR/scripts/"*.py  /opt/prepperpi/scripts/ 2>/dev/null || true
+else
+    info "Repository is already at /opt/prepperpi — skipping self-copy."
+fi
 chmod +x /opt/prepperpi/scripts/*.sh
 
 # ── Static IP for wlan0 via dhcpcd ───────────────────────────────────────────
@@ -164,6 +168,7 @@ cp "$REPO_DIR/configs/nginx/prepperpi.conf" /etc/nginx/sites-available/prepperpi
 ln -sf /etc/nginx/sites-available/prepperpi /etc/nginx/sites-enabled/prepperpi
 rm -f /etc/nginx/sites-enabled/default
 nginx -t || die "nginx config test failed — check configs/nginx/prepperpi.conf"
+systemctl restart nginx
 
 # ── systemd units ─────────────────────────────────────────────────────────────
 info "Installing systemd units..."
