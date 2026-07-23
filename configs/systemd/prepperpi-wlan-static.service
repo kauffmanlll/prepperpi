@@ -1,0 +1,12 @@
+[Unit]
+Description=Assign static IP to the PrepperPi AP interface
+After=hostapd.service
+Before=dnsmasq.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/prepperpi/scripts/apply_wlan_static_ip.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

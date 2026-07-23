@@ -99,19 +99,19 @@ else
 fi
 chmod +x /opt/prepperpi/scripts/*.sh
 
-# ── Static IP for wlan0 via dhcpcd ───────────────────────────────────────────
-info "Configuring static IP ${PI_IP}/${PREFIX} on ${WIFI_INTERFACE}..."
-DHCP_MARKER="# PrepperPi: static ${WIFI_INTERFACE}"
-if ! grep -qF "$DHCP_MARKER" /etc/dhcpcd.conf 2>/dev/null; then
-    cat >> /etc/dhcpcd.conf << EOF
-
-${DHCP_MARKER}
-interface ${WIFI_INTERFACE}
-    static ip_address=${PI_IP}/${PREFIX}
-    nohook wpa_supplicant
+# ── Release the AP interface from NetworkManager, if present ─────────────────
+# On NetworkManager-managed systems (e.g. Debian Trixie), wlan0 otherwise stays
+# a DHCP client of whatever Wi-Fi it was last joined to, which conflicts with
+# hostapd and leaves the interface without the static AP address dnsmasq needs.
+if command -v nmcli &>/dev/null && systemctl is-active --quiet NetworkManager; then
+    info "NetworkManager detected — marking ${WIFI_INTERFACE} unmanaged so hostapd can control it..."
+    mkdir -p /etc/NetworkManager/conf.d
+    cat > /etc/NetworkManager/conf.d/prepperpi-unmanaged.conf << EOF
+[keyfile]
+unmanaged-devices=interface-name:${WIFI_INTERFACE}
 EOF
-else
-    info "dhcpcd.conf already contains static ${WIFI_INTERFACE} block — skipping."
+    nmcli device disconnect "${WIFI_INTERFACE}" 2>/dev/null || true
+    nmcli general reload conf 2>/dev/null || true
 fi
 
 # ── dnsmasq ───────────────────────────────────────────────────────────────────
@@ -188,8 +188,9 @@ cp "$REPO_DIR/systemd/prepperpi-kiwix.service.d/override.conf" \
 mkdir -p /etc/systemd/system/dnsmasq.service.d
 cat > /etc/systemd/system/dnsmasq.service.d/override.conf << 'UNIT'
 [Unit]
-After=network-online.target hostapd.service
+After=network-online.target hostapd.service prepperpi-wlan-static.service
 Wants=network-online.target
+Requires=prepperpi-wlan-static.service
 
 [Service]
 Restart=on-failure
@@ -203,8 +204,9 @@ systemctl daemon-reload
 # Core infrastructure — start now since they don't need a reboot
 systemctl enable --now nginx
 
-# AP stack — enable now, will fully activate after reboot when dhcpcd sets the static IP
+# AP stack — enable now, will fully activate after reboot
 systemctl enable hostapd
+systemctl enable prepperpi-wlan-static.service
 systemctl enable dnsmasq
 
 # PrepperPi services
