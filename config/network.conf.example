@@ -1,16 +1,17 @@
 # Example network configuration for PrepperPi
 # Copy to config/network.conf and edit values.
+# Variable names below must match what scripts/install.sh reads — do not rename.
 
-# Access Point settings
-WIFI_SSID="PrepperPi"
-WIFI_PSK="CHANGE_ME_STRONG_PASSWORD"
-WIFI_CHANNEL="6"
-WIFI_COUNTRY="US"
+# Access Point (hostapd) settings
+SSID="PrepperPi"
+PASSPHRASE="CHANGE_ME_STRONG_PASSWORD"
+COUNTRY="US"
+WIFI_INTERFACE="wlan0"
 
-# LAN/static addressing
-LAN_INTERFACE="eth0"
-LAN_ADDRESS="192.168.50.1"
-LAN_NETMASK="255.255.255.0"
-LAN_DHCP_RANGE_START="192.168.50.100"
-LAN_DHCP_RANGE_END="192.168.50.200"
-LAN_DNS="192.168.50.1"
+# Static IP / subnet for the AP interface
+SUBNET="10.10.0.0/24"
+PI_IP="10.10.0.1"
+
+# DHCP range handed out by dnsmasq
+DHCP_RANGE_START="10.10.0.50"
+DHCP_RANGE_END="10.10.0.150"

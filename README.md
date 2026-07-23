@@ -66,8 +66,11 @@ Edit `/opt/prepperpi/config/network.conf`:
 SSID="PrepperPi"
 PASSPHRASE="PrepperPi1234!"
 COUNTRY="US"
+WIFI_INTERFACE="wlan0"
 SUBNET="10.10.0.0/24"
 PI_IP="10.10.0.1"
+DHCP_RANGE_START="10.10.0.50"
+DHCP_RANGE_END="10.10.0.150"
 ```
 
 **⚠️ Important**: Change the default password immediately after installation!
