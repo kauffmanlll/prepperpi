@@ -35,7 +35,7 @@ for var in SSID PASSPHRASE COUNTRY WIFI_INTERFACE SUBNET PI_IP DHCP_RANGE_START 
         || die "$var is not set in config/network.conf. Compare against config/network.conf.example."
 done
 
-[[ "${PASSPHRASE}" != "PrepperPi1234!" ]] \
+[[ "${PASSPHRASE}" != "CHANGE_ME_STRONG_PASSWORD" ]] \
     || die "Set a real PASSPHRASE in config/network.conf before installing."
 [[ ${#PASSPHRASE} -ge 8 && ${#PASSPHRASE} -le 63 ]] \
     || die "PASSPHRASE must be 8–63 characters (WPA2 requirement)."
