@@ -4,7 +4,7 @@
 
 # Access Point (hostapd) settings
 SSID="PrepperPi"
-PASSPHRASE="PrepperPi1234!"
+PASSPHRASE="CHANGE_ME_STRONG_PASSWORD"
 COUNTRY="US"
 WIFI_INTERFACE="wlan0"
 
