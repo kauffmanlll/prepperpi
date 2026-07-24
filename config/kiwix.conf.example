@@ -4,14 +4,16 @@
 # dated download URLs and storage profiles — this file only lists the
 # variables scripts/update_content.sh requires.
 
-KIWIX_PORT=8080
 KIWIX_DATA_DIR="/opt/prepperpi/data/kiwix"
 KIWIX_LIBRARY_FILE="/opt/prepperpi/data/library.xml"
 PDF_DATA_DIR="/opt/prepperpi/data/pdfs"
 DOCUMENTS_DATA_DIR="/opt/prepperpi/data/documents"
 
 DOWNLOAD_LIMIT="2M"
+RETRY_ATTEMPTS=3
+TIMEOUT_SECONDS=7200
 MIN_FREE_SPACE="10GB"
+AUTO_CLEANUP=true
 
 STORAGE_PROFILE="minimal"   # minimal | medium | large
 
