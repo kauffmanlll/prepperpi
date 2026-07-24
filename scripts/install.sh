@@ -162,6 +162,12 @@ chmod 600 /etc/hostapd/hostapd.conf
 sed -i 's|^#\?DAEMON_CONF=.*|DAEMON_CONF="/etc/hostapd/hostapd.conf"|' /etc/default/hostapd
 systemctl unmask hostapd
 
+# ── polkit ────────────────────────────────────────────────────────────────────
+info "Installing polkit rule for web-triggered updates..."
+mkdir -p /etc/polkit-1/rules.d
+cp "$REPO_DIR/configs/polkit/49-prepperpi.rules" /etc/polkit-1/rules.d/49-prepperpi.rules
+systemctl try-restart polkit 2>/dev/null || true
+
 # ── nginx ─────────────────────────────────────────────────────────────────────
 info "Configuring nginx..."
 cp "$REPO_DIR/configs/nginx/prepperpi.conf" /etc/nginx/sites-available/prepperpi
