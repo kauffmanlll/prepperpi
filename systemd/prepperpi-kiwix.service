@@ -8,7 +8,7 @@ Type=simple
 User=prepperpi
 Group=prepperpi
 WorkingDirectory=/opt/prepperpi/data
-ExecStart=/usr/bin/kiwix-serve --port=8080 --library=/opt/prepperpi/data/library.xml
+ExecStart=/usr/bin/kiwix-serve --port=8080 --library /opt/prepperpi/data/library.xml
 Restart=always
 RestartSec=10
 StandardOutput=journal
