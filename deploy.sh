@@ -17,16 +17,20 @@ PI_HOST="${1:-${PI_HOST:-pi@192.168.50.30}}"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STAGE="/tmp/prepperpi-deploy-$$"
 
+# accept-new: auto-trust a host key on first connection (normal case), but
+# still hard-fail if a previously-known host's key ever unexpectedly changes.
+SSH_OPTS=(-o StrictHostKeyChecking=accept-new -o ConnectTimeout=5)
+
 echo "[deploy] Checking SSH connectivity to ${PI_HOST}..."
-ssh -o BatchMode=yes -o ConnectTimeout=5 "$PI_HOST" true \
+ssh "${SSH_OPTS[@]}" "$PI_HOST" true \
     || { echo "[deploy] Could not reach ${PI_HOST} over SSH." >&2; exit 1; }
 
 echo "[deploy] Staging scripts/, webapp/, configs/, systemd/ on the Pi..."
-ssh "$PI_HOST" "mkdir -p '$STAGE'"
-scp -rq "$REPO_DIR/scripts" "$REPO_DIR/webapp" "$REPO_DIR/configs" "$REPO_DIR/systemd" "${PI_HOST}:${STAGE}/"
+ssh "${SSH_OPTS[@]}" "$PI_HOST" "mkdir -p '$STAGE'"
+scp -rq "${SSH_OPTS[@]}" "$REPO_DIR/scripts" "$REPO_DIR/webapp" "$REPO_DIR/configs" "$REPO_DIR/systemd" "${PI_HOST}:${STAGE}/"
 
 echo "[deploy] Applying files and restarting services..."
-ssh -t "$PI_HOST" bash -s -- "$STAGE" <<'REMOTE'
+ssh -t "${SSH_OPTS[@]}" "$PI_HOST" bash -s -- "$STAGE" <<'REMOTE'
 set -euo pipefail
 STAGE="$1"
 
