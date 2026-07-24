@@ -276,18 +276,20 @@ update_kiwix_library() {
     info_log "Updating Kiwix library..."
     
     cd "$KIWIX_DATA_DIR"
-    
-    # Initialize library if it doesn't exist
-    if [[ ! -f "$KIWIX_LIBRARY_FILE" ]]; then
-        touch "$KIWIX_LIBRARY_FILE"
-        info_log "Created new Kiwix library file"
+
+    # Don't pre-create the library file: kiwix-manage treats a zero-byte
+    # touch'd file as an unreadable/invalid library and refuses to add to
+    # it, but creates a fresh valid one itself when the path doesn't exist
+    # yet. If a previous run left an empty one behind, clear it out.
+    if [[ -f "$KIWIX_LIBRARY_FILE" && ! -s "$KIWIX_LIBRARY_FILE" ]]; then
+        rm -f "$KIWIX_LIBRARY_FILE"
     fi
-    
+
     # Add all ZIM files to library
     local zim_count=0
     for zim_file in *.zim; do
         if [[ -f "$zim_file" ]]; then
-            if kiwix-manage "$KIWIX_LIBRARY_FILE" add "$zim_file" 2>/dev/null; then
+            if kiwix-manage "$KIWIX_LIBRARY_FILE" add "$zim_file"; then
                 success_log "Added to library: $zim_file"
                 zim_count=$((zim_count + 1))
             else
