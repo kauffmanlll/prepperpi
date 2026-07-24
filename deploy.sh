@@ -48,9 +48,11 @@ ssh "${SSH_OPTS[@]}" "$PI_HOST" "mkdir -p '$STAGE'"
 scp -rq "${SSH_OPTS[@]}" "$REPO_DIR/scripts" "$REPO_DIR/webapp" "$REPO_DIR/configs" "$REPO_DIR/systemd" "${PI_HOST}:${STAGE}/"
 
 echo "[deploy] Applying files and restarting services..."
-ssh -t "${SSH_OPTS[@]}" "$PI_HOST" bash -s -- "$STAGE" <<'REMOTE'
+REMOTE_USER="${PI_HOST%%@*}"
+ssh -t "${SSH_OPTS[@]}" "$PI_HOST" bash -s -- "$STAGE" "$REMOTE_USER" <<'REMOTE'
 set -euo pipefail
 STAGE="$1"
+REMOTE_USER="$2"
 
 sudo cp -r "$STAGE/scripts/."  /opt/prepperpi/scripts/
 sudo cp -r "$STAGE/webapp/."   /opt/prepperpi/webapp/
@@ -60,7 +62,12 @@ rm -rf "$STAGE"
 
 sudo find /opt/prepperpi/scripts -name "*.sh" -exec dos2unix -q {} \;
 sudo chmod +x /opt/prepperpi/scripts/*.sh
-sudo chown -R prepperpi:prepperpi /opt/prepperpi/scripts /opt/prepperpi/webapp
+sudo chmod 644 /opt/prepperpi/webapp/*.py 2>/dev/null || true
+# `sudo cp` above leaves these root-owned. prepperpi only needs read+execute
+# (already covered by world-readable/executable), and if this is a live git
+# checkout (REPO_DIR == /opt/prepperpi), root ownership would block whoever
+# normally manages it with git. Hand it back to the login user.
+sudo chown -R "$REMOTE_USER:$REMOTE_USER" /opt/prepperpi/scripts /opt/prepperpi/webapp /opt/prepperpi/configs /opt/prepperpi/systemd
 
 # Re-apply the configs that live outside /opt/prepperpi
 sudo cp /opt/prepperpi/configs/nginx/prepperpi.conf /etc/nginx/sites-available/prepperpi

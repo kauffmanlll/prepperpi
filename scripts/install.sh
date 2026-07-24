@@ -227,14 +227,16 @@ systemctl enable os-update-weekly.timer
 
 # ── File permissions ──────────────────────────────────────────────────────────
 info "Setting file permissions..."
-# Exclude .git: when REPO_DIR is /opt/prepperpi itself (the documented deploy
-# path), this is a live git checkout — leave its ownership alone so whoever
-# clones/pulls it (pi, root, ...) keeps working, rather than handing repo
-# metadata to the unrelated, low-privilege prepperpi service account.
-find /opt/prepperpi -mindepth 1 -maxdepth 1 ! -name '.git' -exec chown -R prepperpi:prepperpi {} +
+# prepperpi only needs to *write* to data/logs/backup at runtime — it never
+# needs to own the code (scripts/webapp) or repo metadata (.git). When
+# REPO_DIR is /opt/prepperpi itself (the documented deploy path), this is a
+# live git checkout; owning scripts/webapp with the service account instead
+# of leaving them with whoever manages git (pi, root, ...) blocks git from
+# operating on those files at all.
+chown -R prepperpi:prepperpi /opt/prepperpi/data /opt/prepperpi/logs /opt/prepperpi/backup
 chown -R prepperpi:prepperpi /var/log/prepperpi
-chmod 750 /opt/prepperpi/scripts/*.sh
-chmod 640 /opt/prepperpi/webapp/*.py 2>/dev/null || true
+chmod +x /opt/prepperpi/scripts/*.sh
+chmod 644 /opt/prepperpi/webapp/*.py 2>/dev/null || true
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
