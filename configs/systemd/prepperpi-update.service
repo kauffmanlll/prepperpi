@@ -6,6 +6,6 @@ Type=oneshot
 User=prepperpi
 Group=prepperpi
 WorkingDirectory=/opt/prepperpi
-ExecStart=/opt/prepperpi/scripts/update.sh
+ExecStart=/opt/prepperpi/scripts/update_content.sh
 StandardOutput=append:/var/log/prepperpi/update.log
 StandardError=append:/var/log/prepperpi/update.log

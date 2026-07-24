@@ -70,7 +70,7 @@ info "Creating directory structure under /opt/prepperpi..."
 install -d -m 755 \
     /opt/prepperpi \
     /opt/prepperpi/data \
-    /opt/prepperpi/data/zim \
+    /opt/prepperpi/data/kiwix \
     /opt/prepperpi/logs \
     /opt/prepperpi/backup \
     /opt/prepperpi/scripts \

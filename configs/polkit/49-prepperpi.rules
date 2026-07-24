@@ -1,10 +1,12 @@
-// Allow the unprivileged prepperpi service account to start the
-// content-update unit from the web UI without a password prompt.
+// Allow the unprivileged prepperpi service account to control specific
+// PrepperPi units from the web UI / update pipeline without a password
+// prompt: starting the update job, and update_content.sh restarting
+// kiwix after it rebuilds the library.
 polkit.addRule(function(action, subject) {
     if (action.id == "org.freedesktop.systemd1.manage-units" &&
         subject.user == "prepperpi") {
         var unit = action.lookup("unit");
-        if (unit == "prepperpi-update.service") {
+        if (unit == "prepperpi-update.service" || unit == "prepperpi-kiwix.service") {
             return polkit.Result.YES;
         }
     }

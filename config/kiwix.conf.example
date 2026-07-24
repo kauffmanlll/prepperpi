@@ -1,8 +1,24 @@
 # Example Kiwix configuration
 # Copy to config/kiwix.conf and edit values.
+# See config/kiwix.conf in this repo for a full worked example with real,
+# dated download URLs and storage profiles — this file only lists the
+# variables scripts/update_content.sh requires.
 
 KIWIX_PORT=8080
-KIWIX_BIND=0.0.0.0
-KIWIX_DATA_DIR="/opt/prepperpi/data/zim"
-# Example ZIM files (use manifests to manage sets)
-# KIWIX_ZIMS="wikipedia_en_all_maxi_2024-08.zim vikidia_en_all.zim"
+KIWIX_DATA_DIR="/opt/prepperpi/data/kiwix"
+KIWIX_LIBRARY_FILE="/opt/prepperpi/data/library.xml"
+PDF_DATA_DIR="/opt/prepperpi/data/pdfs"
+DOCUMENTS_DATA_DIR="/opt/prepperpi/data/documents"
+
+DOWNLOAD_LIMIT="2M"
+MIN_FREE_SPACE="10GB"
+
+STORAGE_PROFILE="minimal"   # minimal | medium | large
+
+# ZIM files to download for this run — see config/kiwix.conf for examples
+CONTENT_SOURCES=(
+    # "https://download.kiwix.org/zim/wikipedia/wikipedia_en_top.zim"
+)
+
+SURVIVAL_PDF_SOURCES=()
+MEDICAL_PDF_SOURCES=()
