@@ -365,10 +365,13 @@ EOF
     info_log "Content report saved to $report_file"
 }
 
-# Check prerequisites and system requirements  
+# Check prerequisites and system requirements
 check_prerequisites() {
     info_log "Checking prerequisites..."
-    
+
+    # check_disk_space needs these to already exist
+    mkdir -p "$KIWIX_DATA_DIR" "$PDF_DATA_DIR" "$DOCUMENTS_DATA_DIR"
+
     # Check required commands
     local required_commands=("wget" "kiwix-manage" "kiwix-serve")
     for cmd in "${required_commands[@]}"; do
