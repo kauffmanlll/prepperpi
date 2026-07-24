@@ -17,9 +17,27 @@ PI_HOST="${1:-${PI_HOST:-pi@192.168.50.30}}"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STAGE="/tmp/prepperpi-deploy-$$"
 
+# Multiplex every ssh/scp call below over one authenticated connection, so a
+# password (if key auth isn't set up) is only entered once per run instead
+# of once per call. Nothing about the password itself is ever stored — this
+# just keeps the already-authenticated encrypted channel open for reuse.
+CONTROL_DIR="$(mktemp -d)"
+CONTROL_PATH="${CONTROL_DIR}/ssh.sock"
+cleanup() {
+    ssh -o ControlPath="$CONTROL_PATH" -O exit "$PI_HOST" 2>/dev/null || true
+    rm -rf "$CONTROL_DIR"
+}
+trap cleanup EXIT
+
 # accept-new: auto-trust a host key on first connection (normal case), but
 # still hard-fail if a previously-known host's key ever unexpectedly changes.
-SSH_OPTS=(-o StrictHostKeyChecking=accept-new -o ConnectTimeout=5)
+SSH_OPTS=(
+    -o StrictHostKeyChecking=accept-new
+    -o ConnectTimeout=5
+    -o ControlMaster=auto
+    -o ControlPath="$CONTROL_PATH"
+    -o ControlPersist=10m
+)
 
 echo "[deploy] Checking SSH connectivity to ${PI_HOST}..."
 ssh "${SSH_OPTS[@]}" "$PI_HOST" true \
