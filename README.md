@@ -59,6 +59,35 @@ After reboot:
 
 ## ⚙️ Configuration
 
+### External ZIM Storage
+
+By default, ZIM content lives on the SD card at `/opt/prepperpi/data/kiwix/` (set by `KIWIX_DATA_DIR` in `/opt/prepperpi/config/kiwix.conf`). For larger libraries, or to keep heavy read/write activity off the SD card, move it to external storage instead:
+
+1. **Format and mount the drive** — use `ext4` where possible (it supports Unix ownership natively; `exFAT`/`NTFS` need extra `uid=`/`gid=` mount options to let `prepperpi` own files on them). Mount by UUID in `/etc/fstab` with `nofail`, not by device path (`/dev/sda1` can shift between boots):
+   ```bash
+   lsblk -f   # find the UUID after plugging the drive in
+
+   # /etc/fstab:
+   UUID=xxxx-xxxx  /mnt/kiwix-data  ext4  defaults,nofail  0  2
+   ```
+
+2. **Move existing content and repoint the config:**
+   ```bash
+   sudo mkdir -p /mnt/kiwix-data
+   sudo mount -a
+   sudo rsync -a /opt/prepperpi/data/kiwix/ /mnt/kiwix-data/
+   sudo chown -R prepperpi:prepperpi /mnt/kiwix-data
+   ```
+   Edit `KIWIX_DATA_DIR="/mnt/kiwix-data"` in `/opt/prepperpi/config/kiwix.conf`, then:
+   ```bash
+   sudo systemctl restart prepperpi-kiwix
+   sudo systemctl start prepperpi-update.service   # rebuilds library.xml against the new path
+   ```
+
+**⚠️ Note**: `nofail` means a failed/missing mount won't block boot — but it also means content will silently start re-downloading onto the SD card if the drive isn't actually mounted. Check `mount | grep kiwix-data` after a reboot to confirm it's really there.
+
+Since ZIM files are always re-downloadable from kiwix.org, moving them to more reliable storage than the SD card *is* the backup strategy here — no need to duplicate multi-GB files elsewhere.
+
 ### Network Settings
 
 Edit `/opt/prepperpi/config/network.conf`:
