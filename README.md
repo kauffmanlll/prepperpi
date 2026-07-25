@@ -287,6 +287,15 @@ sudo /opt/prepperpi/scripts/verify_install.sh
    sudo systemctl restart prepperpi-kiwix
    ```
 
+5. **Permission when loading new ZIM files**:
+   ```bash
+   sudo chown prepperpi:prepperpi /opt/prepperpi/data/kiwix/*.zim
+   ```
+6. **Run Update failure**:
+   ```bash
+   sudo rm /tmp/prepperpi_update.lock
+   ```
+
 ### Web Interface Issues
 
 1. **Check nginx status**:

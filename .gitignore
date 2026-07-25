@@ -4,6 +4,8 @@ configs/hostapd/hostapd.conf
 data/
 logs/
 backup/
+zim_bk/
+*.zim
 .env
 *.env
 *.local
